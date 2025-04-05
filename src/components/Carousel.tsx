@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CarouselItem } from '@/lib/types';
 import Image from 'next/image';
 
@@ -13,16 +13,29 @@ export default function Carousel({ items, height = 'h-screen' }: CarouselProps) 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const goToNext = useCallback(() => {
+    if (isAnimating) return;
+    setCurrentIndex((prevIndex) => 
+      prevIndex === items.length - 1 ? 0 : prevIndex + 1
+    );
+    setIsAnimating(true);
+    
+    // Reset animation state after transition
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 1000);
+  }, [isAnimating, items.length]);
+
   // Auto-play functionality
   useEffect(() => {
     const timer = setInterval(() => {
       if (!isAnimating) {
         goToNext();
       }
-    }, 7000); 
+    }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(timer);
-  }, [isAnimating]);
+  }, [isAnimating, goToNext]);
 
   const goToSlide = (index: number) => {
     if (index === currentIndex || isAnimating) return;
@@ -40,19 +53,6 @@ export default function Carousel({ items, height = 'h-screen' }: CarouselProps) 
     if (isAnimating) return;
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? items.length - 1 : prevIndex - 1
-    );
-    setIsAnimating(true);
-    
-    // Reset animation state after transition
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 1000);
-  };
-
-  const goToNext = () => {
-    if (isAnimating) return;
-    setCurrentIndex((prevIndex) => 
-      prevIndex === items.length - 1 ? 0 : prevIndex + 1
     );
     setIsAnimating(true);
     
