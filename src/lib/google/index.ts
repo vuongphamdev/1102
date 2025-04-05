@@ -1,3 +1,3 @@
-export * from './sheets';
+export * from './config';
+export * from './auth';
 export * from './drive';
-export * from './config'; 

@@ -9,8 +9,13 @@ export const GOOGLE_CREDENTIALS = {
 export const GOOGLE_SHEETS_CONFIG = {
   spreadsheetId: process.env.GOOGLE_SHEET_ID || '',
   ranges: {
-    home: 'Home!A3:C', // Assuming columns: Image ID, Title, Description
+    carousel: 'Home!A3:C', // imageId, title, description, imageUrl
+    carouselFolderId: 'Home!B1',
     products: 'Products!A2:G',  // id, name, type, location, time, imageFolderId, description
-    homeFolderId:'Home!B1',
   },
+};
+
+export const GOOGLE_DRIVE_CONFIG = {
+  imageMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  defaultImageUrl: 'https://drive.google.com/uc?export=view&id=',
 };

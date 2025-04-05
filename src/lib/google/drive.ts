@@ -1,29 +1,29 @@
-import { getGoogleDrive } from './auth';
+import { ImageItem } from '@/lib/types';
+import { drive } from './auth';
 
-interface DriveImage {
-  id: string;
-  name: string;
-  mimeType: string;
-  webViewLink: string;
-}
+import { GOOGLE_DRIVE_CONFIG } from './config';
 
-export async function listFolderImages(folderId: string): Promise<DriveImage[]> {
+export async function listFolderImages(folderId: string): Promise<ImageItem[]> {
   try {
-    const drive = await getGoogleDrive();
-    
     const response = await drive.files.list({
-      q: `'${folderId}' in parents and mimeType contains 'image/'`,
+      q: `'${folderId}' in parents and (${GOOGLE_DRIVE_CONFIG.imageMimeTypes.map(type => `mimeType = '${type}'`).join(' or ')})`,
       fields: 'files(id, name, mimeType)',
       orderBy: 'name',
     });
 
-    return response.data.files as DriveImage[] || [];
+    return response.data.files as ImageItem[] || [];
   } catch (error) {
     console.error('Error listing folder images:', error);
     return [];
   }
 }
 
-export function getImageUrl(fileId: string): string {
-  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+export function getImageUrl(fileId: string|undefined): string {
+  if (!fileId) return '';
+  
+  // Use the Google Drive URL
+  const driveUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  
+  // Proxy the request through our API to avoid CORS issues
+  return `/api/image-proxy?url=${encodeURIComponent(driveUrl)}`;
 }
