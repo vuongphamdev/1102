@@ -22,7 +22,7 @@ export function getImageUrl(fileId: string|undefined): string {
   if (!fileId) return '';
   
   // Use the Google Drive URL
-  const driveUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  const driveUrl = GOOGLE_DRIVE_CONFIG.defaultImageUrl+fileId;
   
   // Proxy the request through our API to avoid CORS issues
   return `/api/image-proxy?url=${encodeURIComponent(driveUrl)}`;

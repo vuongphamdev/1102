@@ -42,10 +42,21 @@ export default [
         version: 'detect'
       }
     },
-    env: {
-      browser: true,
-      node: true,
-      es6: true
+    globals: {
+      console: 'readonly',
+      process: 'readonly',
+      setTimeout: 'readonly',
+      setInterval: 'readonly',
+      clearInterval: 'readonly',
+      fetch: 'readonly',
+      HTMLImageElement: 'readonly',
+      React: 'readonly',
+      NextResponse: 'readonly',
+      NextRequest: 'readonly',
+      NextResponse: 'readonly',
+      NextRequest: 'readonly',
+      NextResponse: 'readonly',
+      NextRequest: 'readonly',
     }
   }
 ]; 
