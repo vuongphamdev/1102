@@ -17,17 +17,11 @@ export default [
           jsx: true
         },
         ecmaVersion: 'latest',
-        sourceType: 'module'
-      },
-      globals: {
-        console: 'readonly',
-        process: 'readonly',
-        setTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        fetch: 'readonly',
-        HTMLImageElement: 'readonly',
-        React: 'readonly'
+        sourceType: 'module',
+        globals: {
+          ...globals.browser,
+          ...autoImportGlobals.globals,
+        },
       }
     },
     plugins: {
