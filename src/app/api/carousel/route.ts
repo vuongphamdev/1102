@@ -23,7 +23,7 @@ export async function GET(): Promise<NextResponse<CarouselResponse>> {
       const matchedImage = carouselImagesResponse.find((image) => image.name.split('.')[0] === row[0]);
       console.log(`Row ID: ${row[0]}, Matched image:`, matchedImage);
       
-      const imageUrl = getImageUrl(matchedImage?.id || '', matchedImage?.webContentLink);
+      const imageUrl = getImageUrl(matchedImage?.id);
       console.log(`Generated image URL: ${imageUrl}`);
       
       return {

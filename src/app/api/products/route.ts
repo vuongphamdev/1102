@@ -27,7 +27,7 @@ export async function GET(): Promise<NextResponse<ProductsResponse>> {
         id: image.id,
         name: image.name,
         description: image.name,
-        imageUrl: getImageUrl(image.id, image.webContentLink),
+        imageUrl: getImageUrl(image.id),
         imageFolderId: product.imageFolderId,
       }));
     }));
