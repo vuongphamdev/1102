@@ -19,8 +19,21 @@ const nextConfig = {
         pathname: '/uc/**',
       },
     ],
-    unoptimized: true, // This can help with some Google Drive image loading issues
+    unoptimized: true,
   },
+  headers: async () => {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
+      },
+    ]
+  },
+
 };
 
 export default nextConfig; 

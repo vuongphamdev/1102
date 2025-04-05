@@ -18,16 +18,6 @@ export default [
         },
         ecmaVersion: 'latest',
         sourceType: 'module'
-      },
-      globals: {
-        console: 'readonly',
-        process: 'readonly',
-        setTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        fetch: 'readonly',
-        HTMLImageElement: 'readonly',
-        React: 'readonly'
       }
     },
     plugins: {
@@ -51,6 +41,11 @@ export default [
       react: {
         version: 'detect'
       }
+    },
+    env: {
+      browser: true,
+      node: true,
+      es6: true
     }
   }
 ]; 
