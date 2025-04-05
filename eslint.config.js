@@ -18,6 +18,16 @@ export default [
         },
         ecmaVersion: 'latest',
         sourceType: 'module'
+      },
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        HTMLImageElement: 'readonly',
+        React: 'readonly'
       }
     },
     plugins: {
@@ -41,22 +51,6 @@ export default [
       react: {
         version: 'detect'
       }
-    },
-    globals: {
-      console: 'readonly',
-      process: 'readonly',
-      setTimeout: 'readonly',
-      setInterval: 'readonly',
-      clearInterval: 'readonly',
-      fetch: 'readonly',
-      HTMLImageElement: 'readonly',
-      React: 'readonly',
-      NextResponse: 'readonly',
-      NextRequest: 'readonly',
-      NextResponse: 'readonly',
-      NextRequest: 'readonly',
-      NextResponse: 'readonly',
-      NextRequest: 'readonly',
     }
   }
 ]; 
