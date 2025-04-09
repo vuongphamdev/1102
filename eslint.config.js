@@ -14,6 +14,16 @@ export default [
           jsx: true,
         },
       },
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        HTMLImageElement: 'readonly',
+        React: 'readonly'
+      }
     },
     plugins: {
       '@next/next': pluginNext,
