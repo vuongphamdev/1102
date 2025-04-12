@@ -7,7 +7,7 @@ export async function GET(): Promise<NextResponse<CarouselResponse>> {
     const carouselData = await getCarouselData();
 
     return NextResponse.json(
-      { data: carouselData },
+      { items: carouselData },
       {
         status: 200,
       }
@@ -15,7 +15,7 @@ export async function GET(): Promise<NextResponse<CarouselResponse>> {
   } catch (error) {
     console.error('Error fetching carousel data:', error);
     return NextResponse.json(
-      { data: [], error: 'Failed to fetch carousel data' },
+      { items: [], error: 'Failed to fetch carousel data' },
       {
         status: 500,
       }

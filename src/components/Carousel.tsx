@@ -1,33 +1,78 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { CarouselItem } from '@/lib/types';
+import { useQuery } from '@tanstack/react-query';
+import { useState, useCallback, useEffect } from 'react';
+import { CarouselItem, CarouselResponse } from '@/lib/types';
 import Image from 'next/image';
+import { QUERY_KEYS } from '@/lib/constants';
 
-interface CarouselProps {
-  items: CarouselItem[];
-  height?: string; // Optional height prop
+// Fetch function for the API
+async function fetchCarouselData(): Promise<CarouselResponse> {
+  const response = await fetch('/api/carousel');
+  if (!response.ok) {
+    throw new Error('Failed to fetch carousel data');
+  }
+  return response.json();
 }
 
-export default function Carousel({ items, height = 'h-screen' }: CarouselProps) {
+export default function Carousel() {
+  const { data, isLoading, isError, isSuccess } = useQuery({
+    queryKey: QUERY_KEYS.CAROUSEL,
+    queryFn: fetchCarouselData,
+  });
+
+  const [items, setItems] = useState<CarouselItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const goToNext = useCallback(() => {
-    if (isAnimating) return;
-    setCurrentIndex((prevIndex) => 
-      prevIndex === items.length - 1 ? 0 : prevIndex + 1
-    );
+  const goToSlide = (index: number) => {
+    if (index === currentIndex || isAnimating) return;
+
     setIsAnimating(true);
-    
+    setCurrentIndex(index);
+
     // Reset animation state after transition
     setTimeout(() => {
       setIsAnimating(false);
     }, 1000);
-  }, [isAnimating, items.length]);
+  };
+
+  const goToNext = useCallback(() => {
+    if (isAnimating) return;
+    setCurrentIndex((prevIndex) =>
+      prevIndex === items.length - 1 ? 0 : prevIndex + 1
+    );
+    setIsAnimating(true);
+
+    // Reset animation state after transition
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 1000);
+  }, [isAnimating, data?.items.length]);
+
+  const goToPrevious = () => {
+    if (isAnimating) return;
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? items.length - 1 : prevIndex - 1
+    );
+    setIsAnimating(true);
+
+    // Reset animation state after transition
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      setItems(data.items);
+    }
+  }, [data]);
 
   // Auto-play functionality
   useEffect(() => {
+    if (items.length === 0) return;
+
     const timer = setInterval(() => {
       if (!isAnimating) {
         goToNext();
@@ -37,43 +82,20 @@ export default function Carousel({ items, height = 'h-screen' }: CarouselProps) 
     return () => clearInterval(timer);
   }, [isAnimating, goToNext]);
 
-  const goToSlide = (index: number) => {
-    if (index === currentIndex || isAnimating) return;
-    
-    setIsAnimating(true);
-    setCurrentIndex(index);
-    
-    // Reset animation state after transition
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 1000);
-  };
-
-  const goToPrevious = () => {
-    if (isAnimating) return;
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? items.length - 1 : prevIndex - 1
-    );
-    setIsAnimating(true);
-    
-    // Reset animation state after transition
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 1000);
-  };
-
-  if (!items.length) return null;
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error loading carousel data.</p>;
+  if (items.length === 0) return <p>No data available.</p>;
 
   return (
-    <div className={`relative w-full ${height} overflow-hidden`}>
+    <div className={`relative w-full h-screen overflow-hidden`}>
       {/* Main Carousel */}
       <div className="relative w-full h-full">
         {items.map((item, index) => (
           <div
             key={item.id}
             className={`absolute w-full h-full transition-all duration-1000 ${
-              index === currentIndex 
-                ? 'opacity-100 scale-100' 
+              index === currentIndex
+                ? 'opacity-100 scale-100'
                 : 'opacity-0 scale-105'
             }`}
           >
@@ -87,14 +109,14 @@ export default function Carousel({ items, height = 'h-screen' }: CarouselProps) 
                 priority={index === 0}
                 onError={(e) => {
                   console.error(`Error loading image: ${item.imageUrl}`);
-                  console.error(e);
-                  // Try to reload the image with a different URL format
                   const imgElement = e.target as HTMLImageElement;
-                  if (imgElement && item.imageUrl.includes('drive.google.com')) {
+                  if (
+                    imgElement &&
+                    item.imageUrl.includes('drive.google.com')
+                  ) {
                     const fileId = item.imageUrl.split('/d/')[1]?.split('/')[0];
                     if (fileId) {
                       const fallbackUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-                      console.log(`Trying fallback URL: ${fallbackUrl}`);
                       imgElement.src = fallbackUrl;
                     }
                   }
@@ -134,4 +156,4 @@ export default function Carousel({ items, height = 'h-screen' }: CarouselProps) 
       </div>
     </div>
   );
-} 
+}

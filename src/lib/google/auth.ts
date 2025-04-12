@@ -16,4 +16,4 @@ export const auth = new JWT({
 export const sheets = google.sheets({ version: 'v4', auth });
 
 // Create a Google Drive API client
-export const drive = google.drive({ version: 'v3', auth }); 
+export const drive = google.drive({ version: 'v3', auth });

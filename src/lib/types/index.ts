@@ -15,7 +15,7 @@ export interface CarouselItem {
 }
 
 export interface CarouselResponse {
-  data: CarouselItem[];
+  items: CarouselItem[];
 }
 
 // Product Types
@@ -38,4 +38,4 @@ export interface ProductsResponse {
 export interface ApiResponse<T> {
   data: T;
   error?: string;
-} 
+}

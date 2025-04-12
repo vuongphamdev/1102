@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import { sheets, GOOGLE_SHEETS_CONFIG, listFolderImages, getImageUrl } from '@/lib/google';
+import {
+  sheets,
+  GOOGLE_SHEETS_CONFIG,
+  listFolderImages,
+  getImageUrl,
+} from '@/lib/google';
 import { ProductsResponse, Product } from '@/lib/types';
 
 export async function GET(): Promise<NextResponse<ProductsResponse>> {
@@ -9,7 +14,7 @@ export async function GET(): Promise<NextResponse<ProductsResponse>> {
       range: GOOGLE_SHEETS_CONFIG.ranges.products,
     });
 
-    const rows = response.data.values??[];
+    const rows = response.data.values ?? [];
     const productItems: Product[] = rows.map((row) => ({
       id: row[0] || '',
       name: row[1] || '',
@@ -21,20 +26,25 @@ export async function GET(): Promise<NextResponse<ProductsResponse>> {
       images: [],
     }));
 
-    await Promise.all(productItems.map(async (product) => {
-      const productImages = await listFolderImages(product.imageFolderId);
-      product.images = productImages.map((image) => ({
-        id: image.id,
-        name: image.name,
-        description: image.name,
-        imageUrl: getImageUrl(image.id),
-        imageFolderId: product.imageFolderId,
-      }));
-    }));
+    await Promise.all(
+      productItems.map(async (product) => {
+        const productImages = await listFolderImages(product.imageFolderId);
+        product.images = productImages.map((image) => ({
+          id: image.id,
+          name: image.name,
+          description: image.name,
+          imageUrl: getImageUrl(image.id),
+          imageFolderId: product.imageFolderId,
+        }));
+      })
+    );
 
     return NextResponse.json({ data: productItems });
   } catch (error) {
     console.error('Error fetching products data:', error);
-    return NextResponse.json({ data: [], error: 'Failed to fetch products data' }, { status: 500 });
+    return NextResponse.json(
+      { data: [], error: 'Failed to fetch products data' },
+      { status: 500 }
+    );
   }
-} 
+}
