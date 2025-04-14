@@ -2,7 +2,7 @@ import Carousel from '@/components/Carousel';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
+    <main className="relative flex min-h-screen flex-col items-center">
       <Carousel />
     </main>
   );

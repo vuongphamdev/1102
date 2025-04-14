@@ -16,12 +16,11 @@ async function fetchCarouselData(): Promise<CarouselResponse> {
 }
 
 export default function Carousel() {
-  const { data, isLoading, isError, isSuccess } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.CAROUSEL,
     queryFn: fetchCarouselData,
   });
 
-  const [items, setItems] = useState<CarouselItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -40,7 +39,7 @@ export default function Carousel() {
   const goToNext = useCallback(() => {
     if (isAnimating) return;
     setCurrentIndex((prevIndex) =>
-      prevIndex === items.length - 1 ? 0 : prevIndex + 1
+      prevIndex === data!.items.length - 1 ? 0 : prevIndex + 1
     );
     setIsAnimating(true);
 
@@ -53,7 +52,7 @@ export default function Carousel() {
   const goToPrevious = () => {
     if (isAnimating) return;
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? items.length - 1 : prevIndex - 1
+      prevIndex === 0 ? data!.items.length - 1 : prevIndex - 1
     );
     setIsAnimating(true);
 
@@ -63,70 +62,81 @@ export default function Carousel() {
     }, 1000);
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      setItems(data.items);
-    }
-  }, [data]);
-
   // Auto-play functionality
   useEffect(() => {
-    if (items.length === 0) return;
+    if (!data || data.items.length === 0) return;
 
     const timer = setInterval(() => {
       if (!isAnimating) {
         goToNext();
       }
-    }, 5000); // Change slide every 5 seconds
+    }, 7000); // Change slide every 5 seconds
 
     return () => clearInterval(timer);
   }, [isAnimating, goToNext]);
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error loading carousel data.</p>;
-  if (items.length === 0) return <p>No data available.</p>;
+  if (isLoading || !data)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+
+  if (isError)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Error loading carousel data.
+      </div>
+    );
 
   return (
     <div className={`relative w-full h-screen overflow-hidden`}>
       {/* Main Carousel */}
       <div className="relative w-full h-full">
-        {items.map((item, index) => (
-          <div
-            key={item.id}
-            className={`absolute w-full h-full transition-all duration-1000 ${
-              index === currentIndex
-                ? 'opacity-100 scale-100'
-                : 'opacity-0 scale-105'
-            }`}
-          >
-            <div className="relative w-full h-full flex items-center justify-center">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                fill
-                sizes="100vw"
-                className="object-cover w-full h-auto"
-                priority={index === 0}
-                onError={(e) => {
-                  console.error(`Error loading image: ${item.imageUrl}`);
-                  const imgElement = e.target as HTMLImageElement;
-                  if (
-                    imgElement &&
-                    item.imageUrl.includes('drive.google.com')
-                  ) {
-                    const fileId = item.imageUrl.split('/d/')[1]?.split('/')[0];
-                    if (fileId) {
-                      const fallbackUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-                      imgElement.src = fallbackUrl;
+        {data.items.length > 0 ? (
+          data.items.map((item, index) => (
+            <div
+              key={item.id}
+              className={`absolute w-full h-full transition-all duration-1000 ${
+                index === currentIndex
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-105'
+              }`}
+            >
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  fill
+                  sizes="100vw"
+                  className="object-cover w-full h-auto"
+                  priority={index === 0}
+                  onError={(e) => {
+                    console.error(`Error loading image: ${item.imageUrl}`);
+                    const imgElement = e.target as HTMLImageElement;
+                    if (
+                      imgElement &&
+                      item.imageUrl.includes('drive.google.com')
+                    ) {
+                      const fileId = item.imageUrl
+                        .split('/d/')[1]
+                        ?.split('/')[0];
+                      if (fileId) {
+                        const fallbackUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+                        imgElement.src = fallbackUrl;
+                      }
                     }
-                  }
-                }}
-              />
+                  }}
+                />
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="h-full flex items-center justify-center">
+            No images available
           </div>
-        ))}
+        )}
       </div>
-
       {/* Click Areas for Navigation */}
       <button
         onClick={goToPrevious}
@@ -141,7 +151,7 @@ export default function Carousel() {
 
       {/* Indicators */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 z-30">
-        {items.map((_, index) => (
+        {data.items.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
