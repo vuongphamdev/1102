@@ -15,12 +15,11 @@ async function fetchCarouselData(): Promise<CarouselResponse> {
   return response.json();
 }
 
-export default function Carousel() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: QUERY_KEYS.CAROUSEL,
-    queryFn: fetchCarouselData,
-  });
+interface CarouselProps {
+  items: CarouselItem[];
+}
 
+export default function Carousel({ items }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -39,7 +38,7 @@ export default function Carousel() {
   const goToNext = useCallback(() => {
     if (isAnimating) return;
     setCurrentIndex((prevIndex) =>
-      prevIndex === data!.items.length - 1 ? 0 : prevIndex + 1
+      prevIndex === items.length - 1 ? 0 : prevIndex + 1
     );
     setIsAnimating(true);
 
@@ -47,12 +46,12 @@ export default function Carousel() {
     setTimeout(() => {
       setIsAnimating(false);
     }, 1000);
-  }, [isAnimating, data?.items.length]);
+  }, [isAnimating, items.length]);
 
   const goToPrevious = () => {
     if (isAnimating) return;
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? data!.items.length - 1 : prevIndex - 1
+      prevIndex === 0 ? items.length - 1 : prevIndex - 1
     );
     setIsAnimating(true);
 
@@ -64,7 +63,7 @@ export default function Carousel() {
 
   // Auto-play functionality
   useEffect(() => {
-    if (!data || data.items.length === 0) return;
+    if (!items || items.length === 0) return;
 
     const timer = setInterval(() => {
       if (!isAnimating) {
@@ -75,17 +74,10 @@ export default function Carousel() {
     return () => clearInterval(timer);
   }, [isAnimating, goToNext]);
 
-  if (isLoading || !data)
+  if (!items)
     return (
       <div className="h-screen flex items-center justify-center">
         Loading...
-      </div>
-    );
-
-  if (isError)
-    return (
-      <div className="h-screen flex items-center justify-center">
-        Error loading carousel data.
       </div>
     );
 
@@ -93,8 +85,8 @@ export default function Carousel() {
     <div className={`relative w-full h-screen overflow-hidden`}>
       {/* Main Carousel */}
       <div className="relative w-full h-full">
-        {data.items.length > 0 ? (
-          data.items.map((item, index) => (
+        {items.length > 0 ? (
+          items.map((item, index) => (
             <div
               key={item.id}
               className={`absolute w-full h-full transition-all duration-1000 ${
@@ -151,7 +143,7 @@ export default function Carousel() {
 
       {/* Indicators */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 z-30">
-        {data.items.map((_, index) => (
+        {items.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
