@@ -1,10 +1,8 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import { useState, useCallback, useEffect } from 'react';
 import { CarouselItem, CarouselResponse } from '@/lib/types';
 import Image from 'next/image';
-import { QUERY_KEYS } from '@/lib/constants';
 
 // Fetch function for the API
 async function fetchCarouselData(): Promise<CarouselResponse> {
